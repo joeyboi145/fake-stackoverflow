@@ -1,5 +1,5 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React, { useState, useRef} from 'react'
+import ReactDOM from 'react-dom/client'
 import axios from 'axios'
 import formatDate from '../date'
 import Answers from './Answers'
@@ -12,6 +12,8 @@ const server = axios.create({
 })
 
 export default function QuestionPage(props) {
+  const questionPage = useRef(null)
+  const authorBox = useRef(null)
 
   server.get(props.serverRequest)
     .then(response => {
@@ -30,10 +32,8 @@ export default function QuestionPage(props) {
     server.get(`/users/find/${userID}`)
       .then(response => {
         let { username } = response.data
-        ReactDOM.render(
-          username,
-          document.getElementById('question-author')
-        )
+        if (authorBox.current === null) authorBox.current = ReactDOM.createRoot(document.getElementById('question-author'))
+        authorBox.current.render(username)
       })
       .catch(err => {
         console.log(err)
@@ -183,7 +183,8 @@ export default function QuestionPage(props) {
   }
 
   function fillQuestionPage(question) {
-    ReactDOM.render(
+    if (questionPage.current === null) questionPage.current = ReactDOM.createRoot(document.querySelector('.question-page'))
+    questionPage.current.render(
       <>
         <div id='question'>
           <QuestionStats question={question} />
@@ -217,8 +218,8 @@ export default function QuestionPage(props) {
               onClick={handleAnswerButton}>Answer Question</button>
           </a>
         </div>
-      </>,
-      document.querySelector('.question-page'))
+      </>
+    )
   }
 
   return (

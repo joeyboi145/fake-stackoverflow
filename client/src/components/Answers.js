@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import formatDate from "../date"
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import axios from 'axios'
 import Comments from "./Comments"
 
@@ -13,6 +13,7 @@ const server = axios.create({
 
 export default function Answers({ answerIDs, login, setMessage, setServerRequest, setPage }) {
   const [render, setRender] = useState({ answer_set: 1, answer_count: null })
+  const answerTable = useRef(null)
   const answer_display = 5
   const answers = []
   const promises = answerIDs.map(id => {
@@ -134,7 +135,8 @@ export default function Answers({ answerIDs, login, setMessage, setServerRequest
       )
     }
 
-    ReactDOM.render(
+    if (answerTable.current === null) answerTable.current = ReactDOM.createRoot(document.getElementById('answer-table'))
+    answerTable.current.render(
       <tbody>
         {tabledAnswers}
         <tr>
@@ -145,8 +147,8 @@ export default function Answers({ answerIDs, login, setMessage, setServerRequest
             <button onClick={handleNextButton}>Next</button>
           </td>
         </tr>
-      </tbody>,
-      document.getElementById('answer-table'))
+      </tbody>
+    )
 
   }
 

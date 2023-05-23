@@ -1,5 +1,5 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React, { useRef } from 'react'
+import ReactDOM from 'react-dom/client'
 import formatDate from '../date'
 import axios from 'axios'
 
@@ -10,12 +10,13 @@ const server = axios.create({
 })
 
 export default function TabledQuestion(props) {
+  const authorBox = useRef(null)
+  const tagBox = useRef(null)
+
   const question = props.question
   const votePlurality = (question.votes === 1) ? 'vote' : 'votes'
   const answerPlurality = (question.answers.length === 1) ? ' answer' : 'answers'
   const viewPlurality = (question.views === 1) ? ' view' : ' views'
-  const tagBox = `tagBox${question._id}`
-  const autherBox = `authorBox${question._id}`
   const tags = []
 
   const promises = question.tags.map(tagID => {
@@ -44,9 +45,8 @@ export default function TabledQuestion(props) {
         key={tag._id}
         onClick={handleTagClick}>{tag.name}</button>
     })
-    ReactDOM.render(
-      displayTags,
-      document.getElementById(tagBox))
+    if (tagBox.current === null) tagBox.current = ReactDOM.createRoot(document.getElementById(`tagBox${question._id}`))
+    tagBox.current.render(displayTags)
   }
 
 
@@ -54,12 +54,11 @@ export default function TabledQuestion(props) {
     const userID = question.asked_by
     server.get(`/users/find/${userID}`)
       .then((response) => {
-        console.log(autherBox)
-        ReactDOM.render(
+        if (authorBox.current === null) authorBox.current = ReactDOM.createRoot(document.getElementById(`authorBox${question._id}`))
+        authorBox.current.render(
           <p onClick={() => handleAuthorClick(response.data.userID)}>
             {response.data.username}
           </p>,
-          document.getElementById(autherBox)
         )
       })
       .catch(err => {
@@ -110,11 +109,11 @@ export default function TabledQuestion(props) {
           >
             {question.title}
           </a>
-          <div id={tagBox} className='question-displayTags'></div>
+          <div id={`tagBox${question._id}`} className='question-displayTags'></div>
         </div>
 
         <div className="author-and-recency">
-          <div id={autherBox} className="question-displayAuthor"></div>
+          <div id={`authorBox${question._id}`} className="question-displayAuthor"></div>
           <p className="question-displayDate">asked {formatDate(question.ask_date_time)} </p>
         </div>
       </td>

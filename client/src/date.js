@@ -10,7 +10,6 @@ export default function formatDate (date) {
   const days = Math.floor(hours / 60)
   let text = ''
 
-  console.log(seconds)
   if (seconds < 60) text += seconds + ` ${seconds === 1 ? 'second' : 'seconds'} ago`
   else if (minutes < 60) text += minutes + ` ${minutes === 1 ? 'minute' : 'minutes'} ago`
   else if (hours < 24) text += hours + ` ${hours === 1 ? 'hour' : 'hours'} ago`

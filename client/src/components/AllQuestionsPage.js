@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import ReactDOM from 'react-dom'
+import React, { useState, useRef} from 'react'
+import ReactDOM from 'react-dom/client'
 import TabledQuestion from './TabledQuestion.js'
 import axios from 'axios'
 
@@ -10,6 +10,8 @@ const server = axios.create({
 
 export default function AllQuestionsPage(props) {
   const [render, setRender] = useState({ question_set: 1, question_count: null })
+  const questionTable = useRef(null)
+  const questionCount = useRef(null)
   const question_display = 5
 
   server.get(props.serverRequest)
@@ -66,14 +68,11 @@ export default function AllQuestionsPage(props) {
         </tbody>
     }
 
-    ReactDOM.render(
-      displayList,
-      document.getElementById('questions-displaylist'))
+    if (questionTable.current === null) questionTable.current = ReactDOM.createRoot(document.getElementById('questions-displaylist'))
+    if (questionCount.current === null)  questionCount.current = ReactDOM.createRoot(document.getElementById('question-count')) 
 
-    ReactDOM.render(
-      `${tabledQuestions.length} Questions`,
-      document.getElementById('question-count')
-    )
+    questionTable.current.render(displayList)
+    questionCount.current.render(`${tabledQuestions.length} Questions`)
   }
 
   function handleAskQuestionButton() {

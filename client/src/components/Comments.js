@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import ReactDOM from 'react-dom'
+import React, { useState, useRef } from 'react'
+import ReactDOM from 'react-dom/client'
 import axios from 'axios'
 
 const regex = /\[[^\]]+?\]\([^)]+?\)/g
@@ -13,6 +13,8 @@ export default function Comments({ documentID, documentType, login, setMessage, 
   const [commentReputationError, setCommentReputationError] = useState(false)
   const [commentLengthError, setCommentLengthError] = useState(false)
   const [render, setRender] = useState({ comment_set: 1, comment_count: null })
+  const commentTable = useRef(null)
+
   const comment_display = 3
   let comments = []
 
@@ -117,7 +119,9 @@ export default function Comments({ documentID, documentType, login, setMessage, 
   }
 
   function renderComments(tabledComments) {
-    ReactDOM.render(
+    console.log(documentID, document.getElementById(`${documentID}-comment-table`))
+    if (commentTable.current === null) commentTable.current = ReactDOM.createRoot(document.getElementById(`${documentID}-comment-table`))
+    commentTable.current.render(
       <tbody key={`${documentID}-table`}>
         <tr>
           <td>
@@ -144,8 +148,7 @@ export default function Comments({ documentID, documentType, login, setMessage, 
             />
           </td>}
         </tr>
-      </tbody>,
-      document.getElementById(`${documentID}-comment-table`)
+      </tbody>
     )
   }
 
